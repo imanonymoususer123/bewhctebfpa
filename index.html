@@ -3252,17 +3252,19 @@
 
         // Mobile menu functionality
         function setupMobileMenu() {
-            const navbar = document.querySelector('.nav-container');
-            const navLinks = document.querySelector('.nav-links');
-
-            // Create mobile menu button
+        const navbar = document.querySelector('.navbar');
+        const navContainer = document.querySelector('.nav-container');
+        const navLinks = document.querySelector('.nav-links');
+        
+        // Create mobile menu button if it doesn't exist
+        if (!document.querySelector('.mobile-menu-btn')) {
             const mobileMenuBtn = document.createElement('button');
             mobileMenuBtn.classList.add('mobile-menu-btn');
             mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            navContainer.appendChild(mobileMenuBtn);
 
-            // Add styles for mobile menu
-            const style = document.createElement('style');
-            style.textContent = `
+            // Add necessary styles
+            const mobileStyles = `
                 .mobile-menu-btn {
                     display: none;
                     background: none;
@@ -3271,6 +3273,7 @@
                     font-size: 1.5rem;
                     cursor: pointer;
                     padding: 0.5rem;
+                    z-index: 1000;
                 }
 
                 @media (max-width: 768px) {
@@ -3279,21 +3282,21 @@
                     }
 
                     .nav-links {
+                        display: none;
                         position: absolute;
                         top: 100%;
                         left: 0;
                         right: 0;
-                        background: var(--navy);
+                        background: rgba(10, 38, 71, 0.95);
                         padding: 1rem;
                         flex-direction: column;
                         align-items: center;
                         gap: 1rem;
-                        transition: transform 0.3s ease;
-                        transform: translateY(-150%);
+                        width: 100%;
                     }
 
                     .nav-links.active {
-                        transform: translateY(0);
+                        display: flex;
                     }
 
                     .nav-links a {
@@ -3307,19 +3310,28 @@
                     }
                 }
             `;
-            document.head.appendChild(style);
 
-            // Add button to navbar
-            navbar.appendChild(mobileMenuBtn);
+            // Add styles to document
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = mobileStyles;
+            document.head.appendChild(styleSheet);
 
-            // Toggle menu
-            mobileMenuBtn.addEventListener('click', () => {
+            // Toggle menu function
+            function toggleMenu() {
                 navLinks.classList.toggle('active');
-                mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ?
-                    '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+                const isOpen = navLinks.classList.contains('active');
+                mobileMenuBtn.innerHTML = isOpen ? 
+                    '<i class="fas fa-times"></i>' : 
+                    '<i class="fas fa-bars"></i>';
+            }
+
+            // Event Listeners
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleMenu();
             });
 
-            // Close menu on link click
+            // Close menu when clicking on a link
             navLinks.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', () => {
                     navLinks.classList.remove('active');
@@ -3335,28 +3347,10 @@
                 }
             });
         }
+    }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const track = document.querySelector('.scroll-track');
-            const items = document.querySelectorAll('.industry-item');
-
-            // Clone items and append them to create the infinite effect
-            items.forEach(item => {
-                const clone = item.cloneNode(true);
-                track.appendChild(clone);
-            });
-
-            // Optional: Reset animation when it ends
-            track.addEventListener('animationend', () => {
-                track.style.animation = 'none';
-                track.offsetHeight; // Trigger reflow
-                track.style.animation = null;
-            });
-        });
-
-        // Initialize mobile menu
-        setupMobileMenu();
-
+    // Initialize mobile menu on page load
+    document.addEventListener('DOMContentLoaded', setupMobileMenu);
         // Animate stats on scroll
         // Add this CSS to your stylesheet
         const styleSheet = document.createElement('style');
